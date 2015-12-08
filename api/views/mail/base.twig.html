@@ -1,0 +1,9 @@
+{% block content %}{% endblock %}
+<?php
+$projectTitle = $this->settings['global']['project_name'];
+$projectUrl = $this->settings['global']['project_url'];
+$loginUrl = $projectUrl . 'login.php';
+?>
+---
+This email was sent by Directus – <a href="<?= $projectUrl;?>"><?= $projectTitle; ?></a>
+<a href="<?= $loginUrl; ?>">Log in</a> to manage your email preferences
