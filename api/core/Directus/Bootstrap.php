@@ -107,10 +107,29 @@ class Bootstrap {
 
     private static function mailer() {
         $config = self::get('config');
-        $smtp = $config['SMTP'];
-        $transport = \Swift_SmtpTransport::newInstance($smtp['host'], $smtp['port'])
-            ->setUsername($smtp['username'])
-            ->setPassword($smtp['password']);
+        $mailConfig = $config['mail'];
+        // $smtp = $config['SMTP'];
+        switch ($mailConfig['transport']) {
+            case 'smtp':
+                $transport = \Swift_SmtpTransport::newInstance($mailConfig['host'], $mailConfig['port']);
+                if (array_key_exists($mailConfig['username'])) {
+                    $transport->setUsername($mailConfig['username']);
+                }
+                if (array_key_exists($mailConfig['password'])) {
+                    $transport->setPassword($mailConfig['password']);
+                }
+                break;
+            case 'sendmail':
+                $transport = \Swift_SendmailTransport::newInstance($mailConfig['sendmail']);
+                break;
+            case 'mail':
+            default:
+                $transport = \Swift_MailTransport::newInstance();
+                break;
+        }
+        // $transport = \Swift_SmtpTransport::newInstance($smtp['host'], $smtp['port'])
+        //     ->setUsername($smtp['username'])
+        //     ->setPassword($smtp['password']);
         $mailer = \Swift_Mailer::newInstance($transport);
         return $mailer;
     }
