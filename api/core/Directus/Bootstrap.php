@@ -85,6 +85,7 @@ class Bootstrap {
             'path' => APPLICATION_PATH . '/api/logs'
         );
         $app = new Slim(array(
+            'templates.path'=> APPLICATION_PATH.'/api/views/',
             'mode'          => DIRECTUS_ENV,
             'debug'         => false,
             'log.enable'    => true,
