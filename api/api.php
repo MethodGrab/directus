@@ -380,18 +380,7 @@ $app->post("/$v/auth/forgot-password/?", function() use ($app, $acl, $ZendDb) {
     // $mail = new Directus\Mail\Mailer();
     // $mail->send(new Directus\Mail\ResetPasswordMail($user['email'], $set['reset_token']));
 
-    // @todo: move this. global config object
-    // this is the project url rather than the directus url
-    // right now let's stick to this one :) while we figure it out.
-    $DirectusSettingsTableGateway = new \Zend\Db\TableGateway\TableGateway('directus_settings', Bootstrap::get('zendDb'));
-    $rowSet = $DirectusSettingsTableGateway->select([
-        'collection' => 'global',
-        'name' => 'project_url'
-    ])->current();
-
-    $data = [
-        'resetURL' => trim($rowSet->value, '/').'/api/1/auth/reset-password/'.$set['reset_token']
-    ];
+    $data = ['reset_token' => $set['reset_token']];
     Mail::send('mail/reset-password.twig.html', $data, function($message) use ($user) {
         $message->setSubject('You Reset Your Directus Password');
         $message->setFrom('directus@getdirectus.com');

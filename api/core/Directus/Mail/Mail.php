@@ -9,9 +9,16 @@ use Directus\Bootstrap;
 class Mail
 {
     protected $mailer = null;
+    protected $settings = [];
+
     public function __construct($mailer)
     {
         $this->mailer = $mailer;
+        $DirectusSettingsTableGateway = new \Zend\Db\TableGateway\TableGateway('directus_settings', Bootstrap::get('zendDb'));
+        $rowSet = $DirectusSettingsTableGateway->select();
+        foreach ($rowSet as $setting) {
+            $this->settings[$setting['collection']][$setting['name']] = $setting['value'];
+        }
     }
 
     public function sendMessage($message)
@@ -31,10 +38,11 @@ class Mail
             ob_start();
             $app = Bootstrap::get('app');
             $viewFullPath = $app->container['settings']['templates.path'].$viewPath;
+            $data = array_merge($this->settings, $data);
             extract($data);
             include $viewFullPath;
-            $viewContent = ob_get_clean();
-            $message->setBody($viewContent);
+            $viewContent = nl2br(ob_get_clean());
+            $message->setBody($viewContent, 'text/html');
         }
 
         $instance->sendMessage($message);
