@@ -336,6 +336,12 @@ $app->get("/$v/auth/reset-password/:token/?", function($token) use ($app, $acl, 
     $mail = new Directus\Mail\Mailer();
     // @TODO: Change ForgotPasswordMail to a view/template
     $mail->send(new Directus\Mail\ForgotPasswordMail($user['email'], $password));
+    $data = ['newPassword' => $password];
+    Mail::send('mail/forgot-password.twig.html', $data, function($message) use ($user) {
+        $message->setSubject('Your new Directus password');
+        $message->setFrom('directus@getdirectus.org');
+        $message->setTo($user['email']);
+    });
 
     $app->halt(200, 'New temporary password has been sent.');
 
@@ -376,9 +382,6 @@ $app->post("/$v/auth/forgot-password/?", function() use ($app, $acl, $ZendDb) {
             'success' => false
         ));
     }
-
-    // $mail = new Directus\Mail\Mailer();
-    // $mail->send(new Directus\Mail\ResetPasswordMail($user['email'], $set['reset_token']));
 
     $data = ['reset_token' => $set['reset_token']];
     Mail::send('mail/reset-password.twig.html', $data, function($message) use ($user) {
