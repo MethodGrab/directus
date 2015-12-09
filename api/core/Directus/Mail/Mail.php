@@ -37,10 +37,12 @@ class Mail
             // Slim Extras View twig act weird on this version
             ob_start();
             $app = Bootstrap::get('app');
-            $viewFullPath = $app->container['settings']['templates.path'].$viewPath;
+            $viewContentPath = $app->container['settings']['templates.path'].$viewPath;
+            $viewFooterPath = $app->container['settings']['templates.path'].'mail/footer.twig.html';
             $data = array_merge(['settings'=>$instance->settings], $data);
             extract($data);
-            include $viewFullPath;
+            include $viewContentPath;
+            include $viewFooterPath;
             $viewContent = nl2br(ob_get_clean());
             $message->setBody($viewContent, 'text/html');
         }
