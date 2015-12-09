@@ -333,9 +333,6 @@ $app->get("/$v/auth/reset-password/:token/?", function($token) use ($app, $acl, 
         $app->halt(200, 'Error while resetting the password.');
     }
 
-    $mail = new Directus\Mail\Mailer();
-    // @TODO: Change ForgotPasswordMail to a view/template
-    $mail->send(new Directus\Mail\ForgotPasswordMail($user['email'], $password));
     $data = ['newPassword' => $password];
     Mail::send('mail/forgot-password.twig.html', $data, function($message) use ($user) {
         $message->setSubject('Your new Directus password');
@@ -1175,9 +1172,13 @@ $app->post("/$v/messages/rows/?", function () use ($params, $requestPayload, $ap
                                     $requestPayload['subject'],
                                     $requestPayload['message']
                                 );
-
-            $mail->send($messageNotificationMail);
-            $mail->ClearAllRecipients();
+            $data = ['message' => $requestPayload['message']];
+            $view = 'mail/notification.twig.html';
+            Mail::send($view, $data, function($message) use($user, $requestPayload) {
+                $message->setSubject($requestPayload['subject']);
+                $message->setFrom('directus@getdirectus.com');
+                $message->setTo($user['email']);
+            });
         }
     }
 
