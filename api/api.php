@@ -339,7 +339,7 @@ $app->get("/$v/auth/reset-password/:token/?", function($token) use ($app, $acl, 
     $data = ['newPassword' => $password];
     Mail::send('mail/forgot-password.twig.html', $data, function($message) use ($user) {
         $message->setSubject('Your new Directus password');
-        $message->setFrom('directus@getdirectus.org');
+        $message->setFrom('directus@getdirectus.com');
         $message->setTo($user['email']);
     });
 
