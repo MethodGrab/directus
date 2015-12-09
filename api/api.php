@@ -1161,7 +1161,6 @@ $app->post("/$v/messages/rows/?", function () use ($params, $requestPayload, $ap
       $Activity->recordMessage($requestPayload, $currentUser['id']);
     }
 
-    $mail = new Directus\Mail\Mailer();
     foreach($userRecipients as $recipient) {
         $usersTableGateway = new DirectusUsersTableGateway($acl, $ZendDb);
         $user = $usersTableGateway->findOneBy('id', $recipient);
@@ -1259,19 +1258,18 @@ $app->post("/$v/comments/?", function() use ($params, $requestPayload, $app, $ac
       $i++;
     }
 
-    $mail = new Directus\Mail\Mailer();
     foreach($userRecipients as $recipient) {
         $usersTableGateway = new DirectusUsersTableGateway($acl, $ZendDb);
         $user = $usersTableGateway->findOneBy('id', $recipient);
 
         if(isset($user) && $user['email_messages'] == 1) {
-            $NotificationMail = new Directus\Mail\NotificationMail(
-                                    $user['email'],
-                                    $requestPayload['subject'],
-                                    $requestPayload['message']
-                                );
-
-            $mail->send($NotificationMail);
+            $data = ['message' => $requestPayload['message']];
+            $view = 'mail/notification.twig.html';
+            Mail::send($view, $data, function($message) use($user, $requestPayload) {
+                $message->setSubject($requestPayload['subject']);
+                $message->setFrom('directus@getdirectus.com');
+                $message->setTo($user['email']);
+            });
       }
     }
   }

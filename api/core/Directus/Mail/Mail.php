@@ -33,7 +33,7 @@ class Mail
         $app = Bootstrap::get('app');
         $viewContentPath = $app->container['settings']['templates.path'].$viewPath;
         $viewFooterPath = $app->container['settings']['templates.path'].'mail/footer.twig.html';
-        $data = array_merge(['settings'=>$this->settings], $data);
+        $data = array_merge(['settings' => $this->settings], $data);
 
         extract($data);
         include $viewContentPath;
