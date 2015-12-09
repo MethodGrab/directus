@@ -1166,11 +1166,6 @@ $app->post("/$v/messages/rows/?", function () use ($params, $requestPayload, $ap
         $user = $usersTableGateway->findOneBy('id', $recipient);
 
         if(isset($user) && $user['email_messages'] == 1) {
-            $messageNotificationMail = new Directus\Mail\NotificationMail(
-                                    $user['email'],
-                                    $requestPayload['subject'],
-                                    $requestPayload['message']
-                                );
             $data = ['message' => $requestPayload['message']];
             $view = 'mail/notification.twig.html';
             Mail::send($view, $data, function($message) use($user, $requestPayload) {
