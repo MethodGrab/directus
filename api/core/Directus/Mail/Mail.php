@@ -26,6 +26,22 @@ class Mail
         $this->mailer->send($message);
     }
 
+    public function getViewContent($viewPath, $data)
+    {
+        ob_start();
+
+        $app = Bootstrap::get('app');
+        $viewContentPath = $app->container['settings']['templates.path'].$viewPath;
+        $viewFooterPath = $app->container['settings']['templates.path'].'mail/footer.twig.html';
+        $data = array_merge(['settings'=>$instance->settings], $data);
+
+        extract($data);
+        include $viewContentPath;
+        include $viewFooterPath;
+
+        return nl2br(ob_get_clean());
+    }
+
     public static function send($viewPath, $data, $callback)
     {
         $instance = new static(Bootstrap::get('mailer'));
@@ -35,15 +51,7 @@ class Mail
 
         if ($message->getBody() == null) {
             // Slim Extras View twig act weird on this version
-            ob_start();
-            $app = Bootstrap::get('app');
-            $viewContentPath = $app->container['settings']['templates.path'].$viewPath;
-            $viewFooterPath = $app->container['settings']['templates.path'].'mail/footer.twig.html';
-            $data = array_merge(['settings'=>$instance->settings], $data);
-            extract($data);
-            include $viewContentPath;
-            include $viewFooterPath;
-            $viewContent = nl2br(ob_get_clean());
+            $viewContent = $instance->getViewContent($viewPath, $data);
             $message->setBody($viewContent, 'text/html');
         }
 
