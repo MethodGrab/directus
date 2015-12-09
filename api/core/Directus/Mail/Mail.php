@@ -38,7 +38,7 @@ class Mail
             ob_start();
             $app = Bootstrap::get('app');
             $viewFullPath = $app->container['settings']['templates.path'].$viewPath;
-            $data = array_merge($instance->settings, $data);
+            $data = array_merge(['settings'=>$instance->settings], $data);
             extract($data);
             include $viewFullPath;
             $viewContent = nl2br(ob_get_clean());
